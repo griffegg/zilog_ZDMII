@@ -19,10 +19,13 @@ sw_revision = zdmii.ZDMII_port.read(2)
 time.sleep(ZDMII_COMM_DELAY)
 print('Software Revision: App:'+"%d"%ord(sw_revision[0])+' ZDM:'+"%d"%ord(sw_revision[1]))
 
+# Light Threshold
 current_light_threshold = zdmii.read_integer(ZDMII_READ_LIGHT_THRESHOLD)
 print('Current light threshold: '+"%d"%current_light_threshold)
 current_light_level = zdmii.read_integer(ZDMII_READ_LIGHT_LEVEL)
 print('Current light level: '+"%d"%current_light_level)
+
+# MD*/RST* Pin
 md_rst = zdmii.read_character(ZDMII_READ_MD_RST_CONFIG)
 if (md_rst == ZDMII_MD_RST_CONFIG_MD):
     print('MD*/RST* pin configured as Motion Detect (MD) output('+str(md_rst)+')')
@@ -30,12 +33,18 @@ elif (md_rst == ZDMII_MD_RST_CONFIG_RST):
     print('MD*/RST* pin configured as Reset (RST) input('+str(md_rst)+')')
 else:
     print('MD*/RST* configuration unknown!('+str(md_rst)+')')
+
+# MD Activation time
 activation_time = zdmii.read_integer(ZDMII_READ_MD_ACTIVATION_TIME)
 print('Activation time: '+"%d"%activation_time)
+
+# Hypersense mode
 hypersense_setting = zdmii.read_character(ZDMII_READ_HYPERSENSE_SETTING)
 print('Hypersense setting: '+hypersense_setting)
 hypersense_level = zdmii.read_character(ZDMII_READ_HYPERSENSE_LEVEL)
 print('Hypersense level: '+hypersense_level)
+
+# Frequency response
 freq_resp = zdmii.read_character(ZDMII_READ_FREQ_RESPONSE)
 if (freq_resp == ZDMII_FREQ_RESPONSE_LOW):
     print('Frequency response set to low('+str(freq_resp)+')')
@@ -43,6 +52,8 @@ elif (freq_resp == ZDMII_FREQ_RESPONSE_HIGH):
     print('Frequency response set to high('+str(freq_resp)+')')
 else:
     print('Frequency response unknown!('+str(freq_resp)+')')
+
+# Motion Suspend
 motion_susp = zdmii.read_character(ZDMII_READ_MOTION_SUSPEND)
 if (motion_susp == ZDMII_MOTION_SUSPEND_ON):
     print('Motion supsend is ON('+str(motion_susp)+')')
@@ -50,6 +61,8 @@ elif (motion_susp == ZDMII_MOTION_SUSPEND_OFF):
     print('Motion suspend is OFF('+str(motion_susp)+')')
 else:
     print('Motion suspend is unknown!('+str(motion_susp)+')')
+
+# Serial Command Mode
 serial_cmd_mode = zdmii.read_character(ZDMII_READ_SERIAL_COMMAND)
 if (serial_cmd_mode == ZDMII_SERIAL_ASCII):
     print('Serial Command mode is ASCII('+str(serial_cmd_mode)+')')
@@ -57,6 +70,8 @@ elif (serial_cmd_mode == ZDMII_SERIAL_DECIMAL):
     print('Serial Command mode is decimal('+str(serial_cmd_mode)+')')
 else:
     print('Serial Command mode is unknown!('+str(serial_cmd_mode)+')')
+
+# Motion Detected Unsolicited mode
 motion_det_unsol = zdmii.read_character(ZDMII_READ_UNSOLICITED_MODE)
 if (motion_det_unsol == ZDMII_UNSOLICITED_MODE_ON):
     print('Motion detected unsolicited is ON('+str(motion_det_unsol)+')')
@@ -64,14 +79,24 @@ elif (motion_det_unsol == ZDMII_UNSOLICITED_MODE_OFF):
     print('Motion detected unsolicited is OFF('+str(motion_det_unsol)+')')
 else:
     print('Motion detected unsolicited is unknown!('+str(motion_det_unsol)+')')
+
+# MD* pin active time
 md_active_time = zdmii.read_integer(ZDMII_READ_MD_ACTIVE_TIME)
 print('MD* active output time: '+"%d"%md_active_time)
+
+# Ping
 ping = zdmii.read_integer(ZDMII_READ_PING_VALUE)
 print('Ping value: '+"%d"%ping)
+
+# Range
 range_setting = zdmii.read_integer(ZDMII_READ_RANGE_SETTING)
 print('Range setting: '+"%d"%range_setting)
+
+# Sensitivity
 sensitivity = zdmii.read_integer(ZDMII_READ_SENSITIVITY)
 print('Sensitivity setting: '+"%d"%sensitivity)
+
+# Dual Direction mode
 dual_dir = zdmii.read_character(ZDMII_READ_DUAL_DIRECTION_MODE)
 if (dual_dir == ZDMII_DUAL_DIRECTION_ON):
     print('Dual direction mode is ON('+str(dual_dir)+')')
@@ -79,6 +104,8 @@ elif (dual_dir == ZDMII_DUAL_DIRECTION_OFF):
     print('Dual direction mode is OFF('+str(dual_dir)+')')
 else:
     print('Dual direction mode is unknown!('+str(dual_dir)+')')
+
+# Single Direction mode
 single_dir = zdmii.read_character(ZDMII_READ_SINGLE_DIRECTION_MODE)
 if (single_dir == ZDMII_DIRECTION_R2L):
     print('Single direction mode is R2L('+str(single_dir)+')')
@@ -88,9 +115,12 @@ elif (single_dir == ZDMII_SINGLE_DIRECTION_OFF):
     print('Single direction mode is OFF('+str(single_dir)+')')
 else:
     print('Single direction mode is unknown!('+str(single_dir)+')')
+
+# Sleep mode
 sleep_time = zdmii.read_integer(ZDMII_READ_SLEEP_TIME)
 print('Sleep time setting: '+"%d"%sleep_time)
 
+# Main loop
 while True:
 
     print('*********************')

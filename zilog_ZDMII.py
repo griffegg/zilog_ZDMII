@@ -123,12 +123,13 @@ class zilog_ZDMII(object):
         new_value_string = self.single_int_to_string(new_value)
 
         self.port_write(CMD)
-        cur_thresh = self.port_read()
+        returned_value = self.port_read()
         self.port_write(new_value_string)
         ack_response = self.port_read()
         if (ack_response != ZDMII_ACK):
-            print('thresh ACK failed: '+str(self.ack_response)+\
-                      '[zilog_ZDMII on port '+str(self.portname)+']')
+            print('write_integer ACK failed! Value=('+str(ack_response)+\
+                  ') First returned value: ('+str(returned_value)+\
+                      ') [zilog_ZDMII on port '+str(self.portname)+']')
             return False
         else:
             return True
@@ -137,12 +138,13 @@ class zilog_ZDMII(object):
         result = False
         
         self.port_write(CMD)
-        cur_thresh = self.port_read()
+        returned_value = self.port_read()
         self.port_write(new_value)
         ack_response = self.port_read()
         if (ack_response != ZDMII_ACK):
-            print('thresh ACK failed: '+str(self.ack_response)+\
-                      '[zilog_ZDMII on port '+str(self.portname)+']')
+            print('write_character ACK failed! Value=('+str(ack_response)+\
+                  ') First returned value: ('+str(returned_value)+\
+                      ') [zilog_ZDMII on port '+str(self.portname)+']')
             return False
         else:
             return True
@@ -158,7 +160,7 @@ class zilog_ZDMII(object):
             retries += 1
             result = self.write_integer(ZDMII_WRITE_PING_VALUE, new_ping_value)
             if (result == False):
-                print('Ping failed! Sent: '+str(new_ping)+\
+                print('Ping failed! Sent: '+str(new_ping_value)+\
                       ' Received: '+str(cur_ping_value)+\
                       '[zilog_ZDMII on port '+str(self.portname)+']' )
 
@@ -193,6 +195,14 @@ class zilog_ZDMII(object):
         if (retries == self.max_retries):
             print('Max Reset retries exceeded! [zilog_ZDMII on port '+str(self.portname)+']')
         return result
+
+    def get_sw_revision(self):
+        sw_revision = [0]*2
+        self.port_write(ZDMII_READ_SW_REV)
+        sw_revision = self.ZDMII_port.read(2)
+        time.sleep(ZDMII_COMM_DELAY)
+        return ord(sw_revision[0]), ord(sw_revision[1])
+
 
 if __name__ == '__main__':
     zdmii = zilog_ZDMII("/dev/ttyAMA0")
