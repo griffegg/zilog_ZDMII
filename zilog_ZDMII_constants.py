@@ -12,7 +12,7 @@ ZDMII_STOP_BITS = serial.STOPBITS_ONE
 ##timeout = None: wait forever
 ##timeout = 0: non-blocking mode (return immediately on read)
 ##timeout = x: set timeout to x seconds (float allowed)
-ZDMII_TIMEOUT = 0.1
+ZDMII_TIMEOUT = 1
 ZDMII_FLOW = False      #disable software flow control
 ZDMII_RTSCTS = False    #disable hardware (RTS/CTS) flow control
 ZDMII_DSRDTR = False    #disable hardware (DSR/DTR) flow control
@@ -20,9 +20,13 @@ ZDMII_WTIMEOUT = 0.1    #non-blocking
 
 ZDMII_ACK = (b'\x06')
 ZDMII_NACK = (b'\x15')
+ZDMII_COMM_DELAY = 0.05     # how many seconds to wait after a read or write for the buffer to flush
 
 # Motion Status
 ZDMII_READ_MOTION_STATUS = 'a'
+ZDMII_MOTION_STATUS_MOTION = 'Y'
+ZDMII_MOTION_STATUS_NOMOTION = 'N'
+ZDMII_MOTION_STATUS_NOT_READY = 'U'
 
 # Light Gate Level - control and monitor light level
 # Light gate threshold controls when the MD output is disabled by daylight
@@ -42,6 +46,7 @@ ZDMII_READ_LIGHT_LEVEL = 'b'
 # both are active low
 # if Motion Detect, output low when motion detected.
 # if Reset input, then the module is reset when pin 5 is driven low.
+ZDMII_READ_MD_RST_CONFIG = 'c'
 ZDMII_WRITE_MD_RST_CONFIG = 'C'
 ZDMII_MD_RST_CONFIG_MD = 'M'
 ZDMII_MD_RST_CONFIG_RST = 'R'
