@@ -1,4 +1,29 @@
 #!/usr/bin/env python
+"""
+This is a class driver for the Zilog Detection Module II Passive Infrared Motion Detector
+Written in Python 3.3 for the Raspberry Pi 2
+
+See http://github.com/griffegg/zilog_ZDMII for test code and sample code
+
+Connect to the Raspberry Pi as follows but
+WARNING! Wiring the ZDM backwards will turn it into toast.
+ZDM pin 1: Ground
+ZDM pin 2: 3.3VDC
+ZDM pin 3: TXD
+ZDM pin 4: RXD with a 100K pullup resistor
+ZDM pin 5: not connected
+ZDM pin 6: 100K pullup and photo resistor to ground
+ZDM pin 7: 10K pullup
+ZDM pin 8: Ground
+
+Also, you will need to stop the Raspian Linux OS from using the console port (serial port)
+Do this by visiting the Adafruit "Freeing UART on the Pi"
+https://learn.adafruit.com/adafruit-nfc-rfid-on-raspberry-pi/freeing-uart-on-the-pi
+
+Also, you can test your serial port by doing a loop-back. This is where you wire TXD to RXD
+and run a program like Minicom to see that when you type a character it gets printed on the
+screen
+"""
 import serial, time, sys
 from binascii import unhexlify
 from zilog_ZDMII_constants import *
@@ -28,20 +53,20 @@ class zilog_ZDMII(object):
 
 # Is the device talking?
         print 'Initializing Zilog ZDMII on port '+self.portname
-        sys.stdout.write(".")
+        sys.stdout.write("Ping:")
         sys.stdout.flush()
         if (self.alive()):
-            sys.stdout.write(".")
+            sys.stdout.write("Reset:")
             sys.stdout.flush()
             if (self.reset()):
-                sys.stdout.write(".")
+                sys.stdout.write("PIR:")
                 sys.stdout.flush()
                 retries = 0
                 status = self.read_character(ZDMII_READ_MOTION_STATUS)
                 if (status == 'U' and retries < self.max_retries):     # wait for device to initialize
                     while (status == 'U' and retries < self.max_retries):
                         retries +=1 
-                        sys.stdout.write(".")
+                        sys.stdout.write("U")
                         sys.stdout.flush()
                         time.sleep(5)
                         status = self.read_character(ZDMII_READ_MOTION_STATUS)
@@ -92,7 +117,7 @@ class zilog_ZDMII(object):
         response = self.port_read()
         return response
 
-    def write_integer_with_ack(self, CMD, new_value):
+    def write_integer(self, CMD, new_value):
         result = False
         
         new_value_string = self.single_int_to_string(new_value)
@@ -108,7 +133,7 @@ class zilog_ZDMII(object):
         else:
             return True
 
-    def write_character_with_ack(self, CMD, new_value):
+    def write_character(self, CMD, new_value):
         result = False
         
         self.port_write(CMD)
@@ -131,7 +156,7 @@ class zilog_ZDMII(object):
 
         while (retries < self.max_retries and result == False):
             retries += 1
-            result = self.write_integer_with_ack(ZDMII_WRITE_PING_VALUE, new_ping_value)
+            result = self.write_integer(ZDMII_WRITE_PING_VALUE, new_ping_value)
             if (result == False):
                 print('Ping failed! Sent: '+str(new_ping)+\
                       ' Received: '+str(cur_ping_value)+\

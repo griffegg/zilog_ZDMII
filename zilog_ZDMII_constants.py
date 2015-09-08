@@ -103,9 +103,9 @@ ZDMII_SERIAL_DECIMAL = 'D'
 # Motion Detected Unsolicited Mode
 # sends signal when motion is detected without being prompted
 ZDMII_READ_UNSOLICITED_MODE = 'm'
+ZDMII_WRITE_UNSOLICITED_MODE = 'M'
 ZDMII_UNSOLICITED_MODE_ON = 'Y'
 ZDMII_UNSOLICITED_MODE_OFF = 'N'
-ZDMII_WRITE_UNSOLICITED_MODE = 'M'
 ZDMII_UNSOLICITED_MOTION_DETECTED = 'M'
 
 # MD* Current Active Output Time
