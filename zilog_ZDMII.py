@@ -28,9 +28,9 @@ import serial, time, sys
 from binascii import unhexlify
 from zilog_ZDMII_constants import *
 
-INIT_PASSED = True
-
 class zilog_ZDMII(object):
+
+    INIT_PASSED = True
 
     def __init__(self, portname):
         self.portname = portname
@@ -86,10 +86,10 @@ class zilog_ZDMII(object):
                     status = self.read_character(ZDMII_READ_MOTION_STATUS)
     #                            status = 'U'    # test code
         if (status == '' or retries == self.max_retries):
-            print('Max Motion Status == U retries exceeded! Device has not stabilized.'+\
-                              '[zilog_ZDMII on port '+str(self.portname)+']' )
-            print 'ZDMII status: ('+str(status)+')'
-            INIT_PASSED = False
+            print('Max Motion Status == U retries exceeded! Device has not stabilized.')
+            self.INIT_PASSED = False
+
+#        print 'ZDMII status: ('+str(status)+') INIT_PASSED = '+str(self.INIT_PASSED)
         
 # Done with initialization
                     
@@ -98,7 +98,7 @@ class zilog_ZDMII(object):
         print 'Zilog ZDMII on port '+self.portname+' closed'
 
     def init_success(self):
-        return INIT_PASSED
+        return self.INIT_PASSED
 
     def single_int_to_string(self, int_value):
         import struct
@@ -116,12 +116,14 @@ class zilog_ZDMII(object):
         return string
 
     def port_write(self, CMD):
+        print '\r\nport_write value=('+str(CMD)+')'
         self.ZDMII_port.write(CMD)
         self.ZDMII_port.flushOutput()
         time.sleep(ZDMII_COMM_DELAY)
 
     def port_read(self):
         returned_value = self.ZDMII_port.read(1)
+        print '\r\nport_read value=('+str(returned_value)+')'
         self.ZDMII_port.flushInput()
         time.sleep(ZDMII_COMM_DELAY)
         return returned_value
@@ -143,15 +145,18 @@ class zilog_ZDMII(object):
 
         self.port_write(CMD)
         returned_value = self.port_read()
-        self.port_write(new_value_string)
-        ack_response = self.port_read()
-        if (ack_response != ZDMII_ACK):
-            print('write_integer ACK failed! Value=('+str(ack_response)+\
-                  ') First returned value: ('+str(returned_value)+\
-                      ') [zilog_ZDMII on port '+str(self.portname)+']')
-            return False
+        if (returned_value != ''):
+            self.port_write(new_value_string)
+            ack_response = self.port_read()
+            if (ack_response != ZDMII_ACK):
+                print('\r\nwrite_integer ACK failed! Value=('+str(ack_response)+\
+                  ') First returned value: ('+str(returned_value)+')')
+                return False            
+            else:
+                return True
         else:
-            return True
+            print('\r\nwrite_integer returned_value failed! Value=('+str(returned_value)+')')
+            return False
 
     def write_character(self, CMD, new_value):
         result = False
@@ -161,9 +166,8 @@ class zilog_ZDMII(object):
         self.port_write(new_value)
         ack_response = self.port_read()
         if (ack_response != ZDMII_ACK):
-            print('write_character ACK failed! Value=('+str(ack_response)+\
-                  ') First returned value: ('+str(returned_value)+\
-                      ') [zilog_ZDMII on port '+str(self.portname)+']')
+            print('\r\nwrite_character ACK failed! Value=('+str(ack_response)+\
+                  ') First returned value: ('+str(returned_value)+')')
             return False
         else:
             return True
@@ -177,15 +181,17 @@ class zilog_ZDMII(object):
 
         while (retries < self.max_retries and result == False):
             retries += 1
-            result = self.write_integer(ZDMII_WRITE_PING_VALUE, new_ping_value)
-            if (result == False):
-                print('Ping failed! Sent: '+str(new_ping_value)+\
-                      ' Received: '+str(cur_ping_value)+\
-                      '[zilog_ZDMII on port '+str(self.portname)+']' )
+            cur_ping_value = self.read_character(ZDMII_READ_PING_VALUE)
+            if (cur_ping_value == ''):
+                print('Ping failed! Received: ('+str(cur_ping_value)+')')
 
-        if (retries == self.max_retries):
-            print('alive retries exceeded![zilog_ZDMII on port '+str(self.portname)+']' )
-            
+        if (retries != self.max_retries):
+            while (retries < self.max_retries and result == False):
+                retries += 1
+                result = self.write_integer(ZDMII_WRITE_PING_VALUE, new_ping_value)
+                if (result == False):
+                    print('Ping failed! Sent: '+str(new_ping_value))
+           
         return result
         
     def reset(self):
@@ -208,11 +214,10 @@ class zilog_ZDMII(object):
 #                    result = False  # test code
                     result = True
             else:
-                print('Reset failed: '+str(self.ack_response)+\
-                          '[zilog_ZDMII on port '+str(self.portname)+']')
+                print('\r\nReset failed: '+str(self.ack_response))
 
         if (retries == self.max_retries):
-            print('Max Reset retries exceeded! [zilog_ZDMII on port '+str(self.portname)+']')
+            print('Max Reset retries exceeded!')
         return result
 
     def get_sw_revision(self):
@@ -225,6 +230,7 @@ class zilog_ZDMII(object):
 
 if __name__ == '__main__':
     zdmii = zilog_ZDMII("/dev/ttyAMA0")
+#    print 'INIT_PASSED = '+str(zdmii.init_success())
     if (zdmii.init_success()):
         md_rst = 'U'
 
@@ -562,4 +568,4 @@ if __name__ == '__main__':
                 
             time.sleep(3)
     else:
-        print 'ZDMII ERROR! status = ('+str(status)+')'
+        print 'ZDMII ERROR! ('+str(zdmii.init_success())+')'
